@@ -14,6 +14,9 @@ class MainGame extends Phaser.Scene {
     // }
 
     create(data) {
+        // Отключаем гравитацию
+        this.matter.world.setGravity(0, 0);
+
         // Создание карты большего размера чем экран (1600x1200)
         this.add.rectangle(800, 600, 1600, 1200, 0x333333);
 

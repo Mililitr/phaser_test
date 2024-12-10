@@ -3,6 +3,7 @@ class CharacterSelect extends Phaser.Scene {
     constructor() {
         super('CharacterSelect');
         this.selectedCharacter = null;
+        this.playButton = null;
     }
 
     // preload() {
@@ -18,45 +19,47 @@ class CharacterSelect extends Phaser.Scene {
     // }
 
     create() {
-        // Заголовок
         this.add.text(400, 100, 'Select Your Character', {
             fontSize: '32px',
             fill: '#fff'
         }).setOrigin(0.5);
 
-        // Создание персонажей для выбора
-        const character1 = this.add.rectangle(300, 300, 32, 48, 0xff0000).setInteractive();
-        const character2 = this.add.rectangle(500, 300, 32, 48, 0x00ff00).setInteractive();
+        const character1 = this.add.rectangle(300, 300, 32, 48, 0xff0000)
+            .setInteractive()
+            .setAlpha(0.6);
+        const character2 = this.add.rectangle(500, 300, 32, 48, 0x00ff00)
+            .setInteractive()
+            .setAlpha(0.6);
 
-        // Обработка выбора персонажа
-        character1.on('pointerdown', () => this.selectCharacter('character1'));
-        character2.on('pointerdown', () => this.selectCharacter('character2'));
+        character1.on('pointerdown', () => this.selectCharacter('character1', character1, character2));
+        character2.on('pointerdown', () => this.selectCharacter('character2', character2, character1));
 
-        // Кнопка Play
-        const playButton = this.add.text(400, 500, 'Play', {
+        this.playButton = this.add.text(400, 500, 'Play', {
             fontSize: '24px',
             fill: '#fff',
             backgroundColor: '#333',
             padding: { x: 20, y: 10 }
         })
         .setOrigin(0.5)
-        .setInteractive();
+        .setInteractive()
+        .setAlpha(0.5); // Затемняем кнопку по умолчанию
 
-        playButton.on('pointerdown', () => {
+        this.playButton.on('pointerdown', () => {
             if (this.selectedCharacter) {
                 this.scene.start('MainGame', { character: this.selectedCharacter });
             }
         });
     }
 
-    selectCharacter(characterId) {
+    selectCharacter(characterId, selectedRect, otherRect) {
         this.selectedCharacter = characterId;
-        // Сброс тинта для всех спрайтов
-        const sprites = this.add.displayList.list.filter(item => item.type === 'Sprite');
-        sprites.forEach(sprite => {
-            sprite.setTint(0xffffff);
-        });
-        // Подсветка выбранного персонажа
-        sprites.find(sprite => sprite.texture.key === characterId)?.setTint(0x00ff00);
+        
+        // Подсвечиваем выбранный персонаж и затемняем другой
+        selectedRect.setAlpha(1);
+        otherRect.setAlpha(0.6);
+        
+        // Активируем кнопку Play
+        this.playButton.setAlpha(1);
     }
+
 }
